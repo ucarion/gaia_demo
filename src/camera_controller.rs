@@ -126,14 +126,14 @@ impl CameraController {
         };
     }
 
-    pub fn view_matrix(&self) -> [[f32; 4]; 4] {
+    pub fn view_matrix(&self) -> Matrix4<f32> {
         let camera_look_at = [self.look_at[0], self.look_at[1], 0.0];
 
         Matrix4::look_at(
             self.camera_position().into(),
             camera_look_at.into(),
             [0.0, 1.0, 0.0].into(),
-        ).into()
+        )
     }
 
     pub fn camera_position(&self) -> [f32; 3] {

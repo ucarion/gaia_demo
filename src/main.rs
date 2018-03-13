@@ -17,7 +17,7 @@ mod camera_controller;
 use camera_controller::CameraController;
 
 use cam::CameraPerspective;
-use cgmath::Matrix4;
+use cgmath::{Angle, Matrix4, PerspectiveFov, Rad};
 use fps_counter::FPSCounter;
 use gaia_assetgen::Properties;
 use gfx::Device;
@@ -39,11 +39,15 @@ fn get_projection(window: &PistonWindow) -> [[f32; 4]; 4] {
 }
 
 fn get_mvp(window: &PistonWindow, camera_controller: &CameraController) -> Matrix4<f32> {
-    cam::model_view_projection(
-        vecmath::mat4_id(),
-        camera_controller.view_matrix(),
-        get_projection(window),
-    ).into()
+    let draw_size = window.window.draw_size();
+    let projection = Matrix4::from(PerspectiveFov {
+        fovy: Rad::full_turn() / 8.0,
+        near: 0.001,
+        far: 100.0,
+        aspect: (draw_size.width as f32) / (draw_size.height as f32),
+    });
+
+    projection * camera_controller.view_matrix()
 }
 
 fn desired_level(camera_height: f32) -> u8 {
