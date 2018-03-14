@@ -1,7 +1,6 @@
 use std::f32::consts::PI;
 
-use cam::Camera;
-use cgmath::{Angle, Matrix4, Rad};
+use cgmath::Matrix4;
 use piston::input::mouse::MouseButton;
 use piston::input::{Button, GenericEvent};
 

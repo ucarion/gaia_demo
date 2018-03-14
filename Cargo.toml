@@ -11,10 +11,8 @@ gfx = "0.17"
 hsl = "0.1"
 gaia = "0.1"
 gaia_assetgen = "0.3.1"
-piston3d-cam = "0.3"
 piston = "0.36"
 piston_window = "0.77"
-vecmath = "0.3"
 
 [build-dependencies]
 gaia_assetgen = "0.3.1"

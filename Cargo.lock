@@ -412,9 +412,7 @@ dependencies = [
  "gfx 0.17.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "hsl 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston 0.36.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "piston3d-cam 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston_window 0.77.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "vecmath 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

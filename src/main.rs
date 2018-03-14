@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate error_chain;
 
-extern crate cam;
 extern crate cgmath;
 extern crate fps_counter;
 extern crate gaia;
@@ -10,13 +9,11 @@ extern crate gfx;
 extern crate hsl;
 extern crate piston;
 extern crate piston_window;
-extern crate vecmath;
 
 mod camera_controller;
 
 use camera_controller::CameraController;
 
-use cam::CameraPerspective;
 use cgmath::{Angle, Matrix4, PerspectiveFov, Rad};
 use fps_counter::FPSCounter;
 use gaia_assetgen::Properties;
@@ -27,27 +24,16 @@ use piston_window::*;
 
 error_chain!{}
 
-fn get_projection(window: &PistonWindow) -> [[f32; 4]; 4] {
-    let draw_size = window.window.draw_size();
-
-    CameraPerspective {
-        fov: 45.0,
-        near_clip: 0.001,
-        far_clip: 100.0,
-        aspect_ratio: (draw_size.width as f32) / (draw_size.height as f32),
-    }.projection()
-}
-
 fn get_mvp(window: &PistonWindow, camera_controller: &CameraController) -> Matrix4<f32> {
     let draw_size = window.window.draw_size();
-    let projection = Matrix4::from(PerspectiveFov {
+    let perspective = PerspectiveFov {
         fovy: Rad::full_turn() / 8.0,
         near: 0.001,
         far: 100.0,
         aspect: (draw_size.width as f32) / (draw_size.height as f32),
-    });
+    };
 
-    projection * camera_controller.view_matrix()
+    Matrix4::from(perspective) * camera_controller.view_matrix()
 }
 
 fn desired_level(camera_height: f32) -> u8 {
@@ -171,13 +157,15 @@ fn run() -> Result<()> {
 
         window.draw_2d(&e, |context, graphics| {
             let camera_height = camera_controller.camera_position()[2];
-            text::Text::new_color([0.0, 0.0, 0.0, 1.0], 10).draw(
-                &format!("FPS: {} - Camera height: {}", fps, camera_height),
-                &mut glyphs,
-                &context.draw_state,
-                context.transform.trans(10.0, 10.0),
-                graphics,
-            );
+            text::Text::new_color([0.0, 0.0, 0.0, 1.0], 10)
+                .draw(
+                    &format!("FPS: {} - Camera height: {}", fps, camera_height),
+                    &mut glyphs,
+                    &context.draw_state,
+                    context.transform.trans(10.0, 10.0),
+                    graphics,
+                )
+                .unwrap();
         });
 
         e.resize(|_, _| {
