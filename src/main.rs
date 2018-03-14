@@ -171,13 +171,6 @@ fn run() -> Result<()> {
                 )
                 .unwrap();
         });
-
-        e.resize(|_, _| {
-            // gaia_renderer.set_view_info(
-            //     camera_controller.camera_position(),
-            //     get_mvp(&window, &camera_controller),
-            // );
-        });
     }
 
     Ok(())
