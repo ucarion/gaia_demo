@@ -20,12 +20,74 @@ use gaia_assetgen::Properties;
 use gfx::Device;
 use hsl::HSL;
 use piston::window::WindowSettings;
+use piston::input::Button;
+use piston::input::keyboard::Key;
 use piston_window::*;
+
+use std::time::{SystemTime, UNIX_EPOCH};
 
 error_chain!{}
 
+enum MapMode {
+    Terrain,
+    All,
+    Oecd,
+    Income,
+    Exceptional,
+}
+
+impl MapMode {
+    fn should_show(&self, properties: &Properties) -> bool {
+        match *self {
+            MapMode::Terrain => false,
+            MapMode::All | MapMode::Income => true,
+            MapMode::Oecd => properties["INCOME_GRP"].as_str().unwrap() == "1. High income: OECD",
+            MapMode::Exceptional => {
+                properties["ADMIN"].as_str().unwrap() == "United States of America"
+            }
+        }
+    }
+
+    fn color(&self, properties: &Properties) -> [u8; 4] {
+        match *self {
+            MapMode::Terrain | MapMode::All | MapMode::Oecd => {
+                let color_num = properties["MAPCOLOR13"].as_f64().unwrap() as u8;
+                let (r, g, b) = HSL {
+                    h: 360.0 * (color_num as f64 / 13.0),
+                    s: 1.0,
+                    l: 0.3,
+                }.to_rgb();
+
+                [r, g, b, 64]
+            }
+            MapMode::Income => match properties["INCOME_GRP"].as_str().unwrap() {
+                "1. High income: OECD" => [0, 255, 0, 100],
+                "2. High income: nonOECD" => [50, 200, 0, 100],
+                "3. Upper middle income" => [100, 150, 0, 100],
+                "4. Lower middle income" => [150, 200, 0, 100],
+                "5. Low income" => [255, 0, 0, 100],
+                _ => unreachable!(),
+            },
+            MapMode::Exceptional => {
+                let time = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+
+                let secs = time.as_secs() as f64;
+                let (r, g, b) = HSL {
+                    h: (secs * 100.0) % 360.0,
+                    s: 1.0,
+                    l: 0.5,
+                }.to_rgb();
+
+                [r, g, b, 100]
+            }
+        }
+    }
+}
+
 struct State {
     camera_controller: CameraController,
+    map_mode: MapMode,
+    labels_enabled: bool,
 }
 
 impl State {
@@ -34,6 +96,28 @@ impl State {
         E: GenericEvent,
     {
         self.camera_controller.event(e);
+
+        e.press(|button| match button {
+            Button::Keyboard(Key::D1) => {
+                self.map_mode = MapMode::Terrain;
+            }
+            Button::Keyboard(Key::D2) => {
+                self.map_mode = MapMode::All;
+            }
+            Button::Keyboard(Key::D3) => {
+                self.map_mode = MapMode::Oecd;
+            }
+            Button::Keyboard(Key::D4) => {
+                self.map_mode = MapMode::Income;
+            }
+            Button::Keyboard(Key::D5) => {
+                self.map_mode = MapMode::Exceptional;
+            }
+            Button::Keyboard(Key::D0) => {
+                self.labels_enabled = !self.labels_enabled;
+            }
+            _ => {}
+        });
     }
 
     fn desired_level(&self, camera_height: f32) -> u8 {
@@ -63,30 +147,40 @@ impl State {
     }
 
     fn polygon_color_chooser(&self, properties: &Properties) -> Option<[u8; 4]> {
-        let color_num = properties["MAPCOLOR13"].as_f64().unwrap() as u8;
-        let (r, g, b) = HSL {
-            h: 360.0 * (color_num as f64 / 13.0),
-            s: 1.0,
-            l: 0.3,
-        }.to_rgb();
-
-        Some([r, g, b, 64u8])
-    }
-
-    fn label_style_chooser<'a>(&self, properties: &'a Properties) -> Option<gaia::LabelStyle<'a>> {
-        let is_capital = properties["ADM0CAP"].as_f64().unwrap() == 1.0;
-        if is_capital {
-            let text = properties["NAME"].as_str().unwrap();
-            Some(gaia::LabelStyle {
-                text,
-                scale: 20.0,
-                text_color: [1.0, 1.0, 1.0, 1.0],
-                border_color: [0.0, 0.0, 0.0, 1.0],
-                border_width: 1.0,
-            })
+        if self.map_mode.should_show(properties) {
+            Some(self.map_mode.color(properties))
         } else {
             None
         }
+    }
+
+    fn label_style_chooser<'a>(&self, properties: &'a Properties) -> Option<gaia::LabelStyle<'a>> {
+        if !self.labels_enabled {
+            return None;
+        }
+
+        let height = self.camera_controller.camera_height();
+        let min_zoom = properties["min_zoom"].as_f64().unwrap();
+
+        if height as f64 * min_zoom > 1.5 {
+            return None;
+        }
+
+        let text = properties["NAME"].as_str().unwrap();
+        let is_capital = properties["ADM0CAP"].as_f64().unwrap() == 1.0;
+        let (scale, text_color) = if is_capital {
+            (30.0, [1.0, 1.0, 0.0, 1.0])
+        } else {
+            (20.0, [1.0, 1.0, 1.0, 1.0])
+        };
+
+        Some(gaia::LabelStyle {
+            text,
+            scale,
+            text_color,
+            border_color: [0.0, 0.0, 0.0, 1.0],
+            border_width: 1.0,
+        })
     }
 }
 
@@ -115,6 +209,8 @@ fn run() -> Result<()> {
 
     let mut state = State {
         camera_controller: CameraController::new(),
+        map_mode: MapMode::Terrain,
+        labels_enabled: false,
     };
 
     let mut gaia_renderer =
@@ -160,6 +256,13 @@ fn run() -> Result<()> {
         });
 
         window.draw_2d(&e, |context, graphics| {
+            piston_window::rectangle(
+                [1.0, 1.0, 1.0, 1.0],
+                [0.0, 0.0, 200.0, 15.0],
+                context.transform,
+                graphics,
+            );
+
             let camera_height = state.camera_controller.camera_height();
             text::Text::new_color([0.0, 0.0, 0.0, 1.0], 10)
                 .draw(

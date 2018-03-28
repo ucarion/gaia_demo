@@ -363,7 +363,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "gaia"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "byteorder 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -407,7 +407,7 @@ dependencies = [
  "cgmath 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "fps_counter 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "gaia 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gaia 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gaia_assetgen 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx 0.17.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "hsl 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1538,7 +1538,7 @@ dependencies = [
 "checksum fps_counter 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "5677f60bd4fb01e3bc5b422cd7d0a460883628a0b1c907d483be2fe2c4d332ea"
 "checksum fuchsia-zircon 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2e9763c69ebaae630ba35f74888db465e49e259ba1bc0eda7d06f4a067615d82"
 "checksum fuchsia-zircon-sys 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "3dcaa9ae7725d12cdb85b3ad99a434db70b468c09ded17e012d86b5c1010f7a7"
-"checksum gaia 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c2211d3c0b48ef18c560033ead31fc362ce3334d13fff3fd7189d7da10d9bfb7"
+"checksum gaia 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "5da57fb5dcb359b699f444959fa7a98acb60e162c380f5aff82be304a96273b1"
 "checksum gaia_assetgen 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "b767e026a211146b26b2e6ce6bc5fc5c893705edaf84ef12cdcab050d91ae3e1"
 "checksum gaia_quadtree 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)" = "c3f33c81beb6c33a29ed8fa564d01b5ea74da8a0c3b8ee5da0462f3a962c8e33"
 "checksum generic-array 0.8.3 (registry+https://github.com/rust-lang/crates.io-index)" = "fceb69994e330afed50c93524be68c42fa898c2d9fd4ee8da03bd7363acd26f2"
